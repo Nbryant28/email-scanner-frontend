@@ -11,11 +11,11 @@ export default function SignInPage() {
 
   const handleSignIn = async () => {
     setIsLoading(true);
-    await signIn('azure-ad');
+    await signIn('azure-ad',{callbackUrl: '/dashboard'});
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted px-4">
+    <div className="min-h-screen flex flex-col items-center justify-center bg-muted px-4">
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader>
           <CardTitle className="text-center text-2xl font-bold">📬 Email Tracker</CardTitle>
@@ -34,6 +34,11 @@ export default function SignInPage() {
           </Button>
         </CardContent>
       </Card>
+
+      {/* ✅ Footer */}
+      <footer className="text-center text-xs text-gray-500 mt-6">
+        © {new Date().getFullYear()} Nicholas Bryant • <a href="https://nicholasbryantdev.super.site" target="_blank" rel="noopener noreferrer" className="underline hover:text-blue-600">Portfolio</a>
+      </footer>
     </div>
   );
 }
