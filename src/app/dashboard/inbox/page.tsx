@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
 import { MailX } from 'lucide-react';
+import { useSession } from "next-auth/react";
 
 type Email = {
   id: string;
@@ -15,7 +16,9 @@ type Email = {
 export default function InboxPage() {
   const [emails, setEmails] = useState<Email[] | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const { data: session, status } = useSession();
+  useEffect(() => {
+    console.log('Session data:', session);}, [session]);
   useEffect(() => {
     const fetchEmails = async () => {
       try {

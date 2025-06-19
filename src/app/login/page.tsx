@@ -11,7 +11,7 @@ export default function SignInPage() {
 
   const handleSignIn = async () => {
     setIsLoading(true);
-    await signIn('azure-ad',{callbackUrl: '/dashboard'});
+    await signIn('azure-ad',{callbackUrl: '/dashboard', prompt: 'consent'});
   };
 
   return (
