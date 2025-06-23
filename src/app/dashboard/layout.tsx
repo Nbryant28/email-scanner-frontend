@@ -3,6 +3,14 @@ import { ReactNode } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { NavLink } from "@/components/ui/nav-link";
+import { Home, Mail, BarChart, Bot, MailCheck } from 'lucide-react';
+
+const HomeIcon = Home;
+const MailIcon = Mail;
+const BarChartIcon = BarChart;
+const BotIcon = Bot;
+const MailCheckIcon = MailCheck;
+
 
 
 
@@ -15,9 +23,49 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
         <div>
           <h2 className="text-2xl font-bold mb-6">📬 Email Tracker</h2>
           <nav className="space-y-4">
-          <NavLink href="/dashboard" label="Dashboard" />
-          <NavLink href="/dashboard/inbox" label="Inbox" />
-          <NavLink href="/dashboard/stats" label="Stats" />
+          <NavLink
+  href="/dashboard"
+  label={
+    <span className="inline-flex items-center space-x-2">
+      <span><HomeIcon className="w-4 h-4" /></span>
+      <span>Dashboard</span>
+    </span>
+  }
+/>
+
+<NavLink
+  href="/dashboard/inbox"
+  label={
+    <span className="inline-flex items-center space-x-2">
+      <MailIcon className="w-4 h-4" />
+      <span>Inbox</span>
+    </span>
+  }
+/>
+
+<NavLink
+  href="/dashboard/stats"
+  label={
+    <span className="inline-flex items-center space-x-2">
+      <BarChartIcon className="w-4 h-4" />
+      <span>Stats</span>
+    </span>
+  }
+/>
+
+<NavLink
+  href="/dashboard/ai"
+  label={
+    <span className="inline-flex items-center space-x-2 border border-red-500 rounded-md px-2 py-1 bg-red-50 text-red-700 font-semibold shadow-sm">
+      <BotIcon className="w-4 h-4" />
+      <span>InboxIQ</span>
+      <span className="text-xs bg-red-200 text-red-800 px-1.5 py-0.5 rounded">AI</span>
+    </span>
+  }
+/>
+
+
+
           </nav>
         </div>
         <div>
