@@ -17,7 +17,7 @@ Always keep your responses focused on helping the user improve their job applica
     const { prompt } = await req.json();
 
     const chatResponse = await openai.chat.completions.create({
-      model: 'gpt-4',
+      model: 'gpt-4o',
       messages: [
         { role: 'system', content: systemPrompt  },
         { role: 'user', content: prompt },

@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 📬 InboxIQ – AI-Powered Job Application Tracker
 
-## Getting Started
+InboxIQ is an AI assistant-powered app that helps job seekers analyze, improve, and track job-related emails. It integrates resume uploads, Microsoft Outlook scanning, and OpenAI-powered insights — all in one streamlined, cloud-native dashboard.
 
-First, run the development server:
+## ✨ Features
+
+- ✅ **Upload Resumes (PDF/TXT)** – AI will analyze and suggest improvements to your resume.
+- 🤖 **AI Assistant (GPT-4)** – Ask questions like “How can I improve my job search?” or “Give me tips based on this rejection.”
+- 📥 **Outlook Email Scanning** – Detects job applications, interview invites, and rejections.
+- 📊 **Keyword Matching & Analytics** – Tracks email trends (coming soon).
+- 🌐 **Modern UI** – Built with Next.js, Tailwind CSS, and React Query.
+
+---
+
+## 🧱 Tech Stack
+
+| Category        | Tech                                               |
+|----------------|----------------------------------------------------|
+| Frontend       | Next.js (App Router), Tailwind CSS, React Query    |
+| Backend        | Next.js API Routes, AWS Lambda                     |
+| AI Integration | OpenAI API (GPT-4.1 Assistant)                     |
+| File Parsing   | `pdfjs-dist` for PDF text extraction               |
+| Auth           | Azure OAuth (Microsoft login)                      |
+| Infra (WIP)    | Terraform (S3, Lambda, DynamoDB)                   |
+| DevOps         | GitHub Actions, Docker (Planned)                   |
+
+---
+
+## 🧠 How It Works
+
+1. User uploads a resume and enters a question (e.g. "Improve my resume").
+2. InboxIQ extracts text (PDF or TXT), combines it with the user’s prompt.
+3. Sends the input to OpenAI GPT-4.1 via `/api/ai`.
+4. Displays AI-generated insights to help improve job applications.
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js v18+
+- OpenAI API key
+- Microsoft Azure App Registration (for login)
+- AWS Account (for Lambda integration)
+
+### Setup
 
 ```bash
+git clone https://github.com/your-username/inboxiq.git
+cd inboxiq
+npm install
+
+OPENAI_API_KEY=your_key
+AZURE_AD_CLIENT_ID=your_client_id
+AZURE_AD_CLIENT_SECRET=your_client_secret
+AZURE_AD_TENANT_ID=common
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+💡 Roadmap
+ Stream responses from OpenAI
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+ S3 resume storage
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+ Dashboard analytics (keyword trends, rejection ratios)
 
-## Learn More
+ Job board integration (LinkedIn, Indeed scraping)
 
-To learn more about Next.js, take a look at the following resources:
+ Resume autogeneration from prompt
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+👨‍💻 Author
+Nicholas Bryant
+Senior Software Engineer | Cloud DevOps | React + AWS
+LinkedIn | Portfolio

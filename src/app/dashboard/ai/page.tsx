@@ -5,7 +5,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
 import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
 import * as pdfjsLib from 'pdfjs-dist';
-import { Bot, Loader2, FileText, X } from 'lucide-react';
+import { Bot, Loader2, FileText } from 'lucide-react';
 
 GlobalWorkerOptions.workerSrc = new URL(
   'pdfjs-dist/build/pdf.worker.mjs',
@@ -17,7 +17,7 @@ export default function AIAssistantPage() {
   const [resumeText, setResumeText] = useState('');
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
-  const [fileName, setFileName] = useState<string | null>(null);
+  const [fileName, setFileName] = useState('');
 
   const handleSubmit = async () => {
     if (!input && !resumeText) return;
@@ -33,6 +33,7 @@ export default function AIAssistantPage() {
       });
       const data = await res.json();
       setResponse(data.result || 'No response received.');
+      setInput(''); // clear input after submit
     } catch (error) {
       setResponse('Something went wrong.');
     } finally {
@@ -69,71 +70,45 @@ export default function AIAssistantPage() {
     }
   };
 
-  const handleClearFile = () => {
-    setFileName(null);
-    setResumeText('');
-  };
-
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b pb-3">
-        <div className="flex items-center gap-3">
-          <Bot className="w-6 h-6 text-blue-600" />
-          <h2 className="text-2xl font-bold">InboxIQ</h2>
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
+      <div className="bg-white max-w-2xl w-full p-6 rounded-xl shadow-lg space-y-6">
+        <div className="flex items-center gap-2">
+          <Bot className="text-blue-600 w-5 h-5" />
+          <h1 className="text-xl font-bold">InboxIQ</h1>
+          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">AI Assistant</span>
         </div>
-        <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
-          AI Assistant
-        </span>
-      </div>
 
-      {/* AI Response */}
-      {response && (
-        <div className="bg-gray-50 border p-4 rounded-lg shadow-inner whitespace-pre-wrap text-sm text-gray-800">
-          {response}
-        </div>
-      )}
+        {response && (
+          <div className="bg-gray-50 border p-4 rounded-md text-sm max-h-64 overflow-auto whitespace-pre-wrap">
+            {response}
+          </div>
+        )}
 
-      {/* Prompt & Upload */}
-      <div className="bg-white p-6 rounded-lg shadow space-y-4 border">
-        <Textarea
-          placeholder="Ask something like: 'Improve my resume' or 'Summarize my rejection emails'"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          rows={4}
-        />
+        <div className="space-y-4">
+          <Textarea
+            placeholder="Ask something like: 'Improve my resume' or 'Summarize rejection emails'"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            rows={3}
+            className="w-full"
+          />
 
-        <div className="flex flex-wrap items-center gap-3 text-sm text-gray-600">
-          <FileText className="w-4 h-4 text-gray-500" />
-          <input type="file" accept=".pdf,.txt" onChange={handleFileUpload} />
-
-          {fileName && (
-            <div className="flex items-center bg-gray-100 px-2 py-1 rounded text-xs text-gray-700">
-              <span className="mr-2">{fileName}</span>
-              <button
-                onClick={handleClearFile}
-                className="hover:text-red-500 text-gray-500 transition"
-              >
-                <X className="w-4 h-4" />
-              </button>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <FileText className="w-4 h-4 text-gray-500" />
+              <input type="file" accept=".pdf,.txt" onChange={handleFileUpload} />
+              {resumeText && (
+                <span className="ml-2 text-xs bg-gray-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                  {fileName} <button onClick={() => setResumeText('')}>✖</button>
+                </span>
+              )}
             </div>
-          )}
+            <Button onClick={handleSubmit} disabled={loading} className="bg-blue-600 text-white hover:bg-blue-700">
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Ask InboxIQ'}
+            </Button>
+          </div>
         </div>
-
-        <Button
-          onClick={handleSubmit}
-          disabled={loading}
-          className="bg-blue-600 hover:bg-blue-700 text-white"
-        >
-          {loading ? (
-            <span className="flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Thinking...
-            </span>
-          ) : (
-            'Ask InboxIQ'
-          )}
-        </Button>
       </div>
     </div>
   );
