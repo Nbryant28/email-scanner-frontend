@@ -1,115 +1,119 @@
-'use client';
 
-import { useState } from 'react';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { getDocument, GlobalWorkerOptions } from 'pdfjs-dist';
-import * as pdfjsLib from 'pdfjs-dist';
-import { Bot, Loader2, FileText } from 'lucide-react';
+"use client";
 
-GlobalWorkerOptions.workerSrc = new URL(
-  'pdfjs-dist/build/pdf.worker.mjs',
-  import.meta.url
-).toString();
+import { useState, useRef } from "react";
+import { Mailbox } from "lucide-react"; // or Inbox if preferred
+import { Paperclip, Send, X } from "lucide-react";
+import { motion, Variants } from "framer-motion";
+import { Button } from "@/components/ui/button";
 
-export default function AIAssistantPage() {
-  const [input, setInput] = useState('');
-  const [resumeText, setResumeText] = useState('');
-  const [response, setResponse] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [fileName, setFileName] = useState('');
+export default function AIPage() {
+  const [query, setQuery] = useState("");
+  const [response, setResponse] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const inputRef = useRef<HTMLTextAreaElement>(null);
+  
 
-  const handleSubmit = async () => {
-    if (!input && !resumeText) return;
-    setLoading(true);
-    setResponse('');
-    try {
-      const res = await fetch('/api/ai', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          prompt: `${input}\n\nResume:\n${resumeText}`,
-        }),
-      });
-      const data = await res.json();
-      setResponse(data.result || 'No response received.');
-      setInput(''); // clear input after submit
-    } catch (error) {
-      setResponse('Something went wrong.');
-    } finally {
-      setLoading(false);
-    }
+  const handleQuery = async () => {
+    if (!query && !file) return;
+
+    const formData = new FormData();
+    formData.append("query", query);
+    if (file) formData.append("file", file);
+
+    setResponse("Thinking...");
+    const res = await fetch("/api/ai", {
+      method: "POST",
+      body: formData,
+    });
+
+    const data = await res.json();
+    setResponse(data?.text || "No response");
+    setQuery("");
+    setFile(null);
   };
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setFileName(file.name);
-
-    if (file.type === 'application/pdf') {
-      const arrayBuffer = await file.arrayBuffer();
-      const loadingTask = getDocument({ data: arrayBuffer });
-      const pdf = await loadingTask.promise;
-      let fullText = '';
-
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const content = await page.getTextContent();
-        fullText += content.items.map((item: any) => item.str).join(' ') + '\n';
-      }
-
-      setResumeText(fullText);
-    } else {
-      const reader = new FileReader();
-      reader.onload = () => {
-        const text = reader.result?.toString();
-        if (text) setResumeText(text);
-      };
-      reader.readAsText(file);
-    }
+  
+  const containerVariants: Variants = {
+    hidden: {
+      opacity: 0,
+      y: 20,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 100,
+      },
+    },
   };
+  
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="bg-white max-w-2xl w-full p-6 rounded-xl shadow-lg space-y-6">
-        <div className="flex items-center gap-2">
-          <Bot className="text-blue-600 w-5 h-5" />
-          <h1 className="text-xl font-bold">InboxIQ</h1>
-          <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">AI Assistant</span>
+    <div className="w-full min-h-screen bg-gray-100 p-6 flex flex-col items-center">
+      <motion.div
+        className="w-full max-w-3xl bg-white p-6 rounded-2xl shadow-xl border"
+        variants={containerVariants}
+        initial="hidden"
+        animate="visible"
+      >
+        <div className="flex items-center gap-2 mb-4">
+          <Mailbox className="w-6 h-6 text-blue-600" />
+          <h1 className="text-lg font-semibold text-gray-800">InboxIQ <span className="text-sm text-blue-500">AI Assistant</span></h1>
         </div>
 
         {response && (
-          <div className="bg-gray-50 border p-4 rounded-md text-sm max-h-64 overflow-auto whitespace-pre-wrap">
+          <motion.div
+            className="bg-gray-50 text-sm text-gray-800 whitespace-pre-wrap p-4 rounded-xl border border-gray-200 mb-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
             {response}
-          </div>
+          </motion.div>
         )}
 
         <div className="space-y-4">
-          <Textarea
-            placeholder="Ask something like: 'Improve my resume' or 'Summarize rejection emails'"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
+          <textarea
+            ref={inputRef}
             rows={3}
-            className="w-full"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            className="w-full resize-none rounded-xl border p-3 text-sm text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Ask something like: 'Improve my resume' or 'Summarize rejection emails'"
           />
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-sm text-gray-600">
-              <FileText className="w-4 h-4 text-gray-500" />
-              <input type="file" accept=".pdf,.txt" onChange={handleFileUpload} />
-              {resumeText && (
-                <span className="ml-2 text-xs bg-gray-200 px-2 py-0.5 rounded-full flex items-center gap-1">
-                  {fileName} <button onClick={() => setResumeText('')}>✖</button>
-                </span>
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <label htmlFor="file-upload" className="flex items-center text-sm text-gray-600 cursor-pointer">
+                <Paperclip className="w-4 h-4 mr-1" />
+                Choose File
+                <input
+                  id="file-upload"
+                  type="file"
+                  accept=".pdf,.txt,.docx"
+                  onChange={(e) => setFile(e.target.files?.[0] || null)}
+                  className="hidden"
+                />
+              </label>
+
+              {file && (
+                <div className="flex items-center text-xs bg-gray-200 px-2 py-1 rounded-full">
+                  {file.name}
+                  <X
+                    className="ml-1 w-4 h-4 text-gray-600 cursor-pointer"
+                    onClick={() => setFile(null)}
+                  />
+                </div>
               )}
             </div>
-            <Button onClick={handleSubmit} disabled={loading} className="bg-blue-600 text-white hover:bg-blue-700">
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Ask InboxIQ'}
+
+            <Button onClick={handleQuery} className="bg-black hover:bg-gray-900">
+              <Send className="w-4 h-4 mr-1" /> Ask InboxIQ
             </Button>
           </div>
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }

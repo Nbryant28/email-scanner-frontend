@@ -21,7 +21,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
       {/* Sidebar */}
       <aside className="bg-white border-r shadow-sm p-6 flex flex-col justify-between">
         <div>
-          <h2 className="text-2xl font-bold mb-6">📬 Email Tracker</h2>
+          <h2 className="text-2xl font-bold mb-6">📬 InboxIQ </h2>
           <nav className="space-y-4">
           <NavLink
   href="/dashboard"

@@ -31,7 +31,7 @@ export async function GET(req: NextRequest) {
     const payloadString = response.Payload?.toString() || '{}';
     const parsed = JSON.parse(payloadString);
 
-    // 🔁 Check if body is stringified JSON from Lambda
+  
     const body = typeof parsed.body === 'string' ? JSON.parse(parsed.body) : parsed;
     console.log("📦 Lambda response body:", body);
 
@@ -45,7 +45,6 @@ export async function GET(req: NextRequest) {
       body: msg.body,
       preview: msg.preview,
       keywordsMatched: msg.keywordsMatched,
- // ✅ include body field from Lambda
     }));
 
     return NextResponse.json({ emails: mappedEmails });
