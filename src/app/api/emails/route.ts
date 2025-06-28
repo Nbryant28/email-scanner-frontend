@@ -1,5 +1,5 @@
+// pages/api/emails/route.ts
 import { NextResponse, NextRequest } from 'next/server';
-import { getToken } from 'next-auth/jwt';
 import AWS from 'aws-sdk';
 
 const lambda = new AWS.Lambda({
@@ -11,32 +11,29 @@ const lambda = new AWS.Lambda({
 });
 
 export async function GET(req: NextRequest) {
-  const token = await getToken({ req });
-  console.log("🔑 Decoded token:", token);
+  const authHeader = req.headers.get("authorization");
 
-  if (!token?.accessToken) {
-    console.error("🔒 Missing access token in session");
+  if (!authHeader?.startsWith("Bearer ")) {
+    console.error("❌ Missing or invalid Authorization header");
     return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
   }
+
+  const accessToken = authHeader.split(" ")[1];
 
   try {
     const response = await lambda
       .invoke({
         FunctionName: 'FetchEmailsLambda',
         InvocationType: 'RequestResponse',
-        Payload: JSON.stringify({ accessToken: token.accessToken, useeEmail: token.email }),
+        Payload: JSON.stringify({ accessToken }),
       })
       .promise();
 
     const payloadString = response.Payload?.toString() || '{}';
     const parsed = JSON.parse(payloadString);
-
-  
     const body = typeof parsed.body === 'string' ? JSON.parse(parsed.body) : parsed;
-    console.log("📦 Lambda response body:", body);
 
     const rawEmails = body.emails || [];
-
     const mappedEmails = rawEmails.map((msg: any) => ({
       id: msg.id,
       subject: msg.subject,

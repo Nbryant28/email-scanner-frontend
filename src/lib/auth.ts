@@ -1,6 +1,7 @@
 // src/lib/auth.ts
 
 import { AuthOptions } from "next-auth";
+import {getServerSession} from "next-auth"
 import AzureADProvider from "next-auth/providers/azure-ad";
 
 export const authOptions: AuthOptions = {
@@ -41,3 +42,6 @@ export const authOptions: AuthOptions = {
     },
   }  
 };
+export async function getSessionOnServer(){
+return await getServerSession(authOptions);
+} 
